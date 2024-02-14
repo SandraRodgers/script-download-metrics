@@ -2,7 +2,9 @@ import time
 import os
 import configparser
 import glob
-import sys
+import requests
+from zipfile import ZipFile
+from io import BytesIO
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -13,11 +15,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import pandas as pd
 
-sys.path.append('/Users/sandrarodgers/.pyenv/versions/3.10.10/lib/python3.10/site-packages/selenium/__init__.py')
-config_file = '/Users/sandrarodgers/Automated-Tasks/readme-apiref-csv/config.ini'
 config = configparser.ConfigParser()
-config.read(config_file)
-chromedriver = '/Users/sandrarodgers/Automated-Tasks/readme-apiref-csv/chromedriver'
+config.read('config.ini')
 
 def login(email, password, driver):
     driver.get("https://dash.readme.com/login")
@@ -43,8 +42,15 @@ def login(email, password, driver):
 
     return driver
 
-
-
+def download_chromedriver():
+    print("Downloading chromedriver...")
+    url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+    response = requests.get(url)
+    version_number = response.text.strip()
+    chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_win32.zip"
+    response = requests.get(chromedriver_url)
+    with ZipFile(BytesIO(response.content)) as zip_file:
+        zip_file.extractall()
 
 def download_csv(driver):
     time.sleep(20)
@@ -82,17 +88,15 @@ def add_to_master_csv(new_csv_file):
           # Write the DataFrame to the master.xlsx file with a new sheet name based on the date
           df_new.to_excel(writer, index=False, sheet_name=sheet_name)
 
-
 def main():
-    # Specify the directory containing the CSV files
-    directory = '/Users/sandrarodgers/Automated-Tasks/readme-apiref-csv/'
-    
-    email = config.get('Credentials', 'EMAIL')
-    password = config.get('Credentials', 'PASSWORD')
-    
+    email = os.environ.get('EMAIL')
+    password = os.environ.get('PASSWORD')
+
     options = Options()
     options.add_argument("--headless")
-    service = Service(chromedriver)
+    if not os.path.exists('chromedriver'):
+        download_chromedriver()
+    service = Service('chromedriver')
     service.start()
     driver = webdriver.Remote(service.service_url, options=options)
     
@@ -100,6 +104,7 @@ def main():
     download_csv(driver)
 
     # Find the latest downloaded CSV file
+    directory = os.getcwd()
     list_of_files = glob.glob(os.path.join(directory, '*.csv'))
     if not list_of_files:
         print(f"No CSV files found in {directory}")
