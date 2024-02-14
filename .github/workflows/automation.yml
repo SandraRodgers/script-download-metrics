@@ -1,0 +1,37 @@
+name: Automated Task
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-script:
+    name: Run Script
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Check Chrome version
+        run: |
+          CHROME_VERSION=$(google-chrome --version | cut -d' ' -f3)
+          echo "Chrome version: $CHROME_VERSION"
+          echo "export CHROME_VERSION=$CHROME_VERSION" >> $GITHUB_ENV
+
+      - name: Run script
+        run: python main.py
+        env:
+          EMAIL: ${{ secrets.EMAIL }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          CHROME_VERSION: ${{ env.CHROME_VERSION }}

@@ -1,10 +1,11 @@
 import time
 import os
-import configparser
+import platform
+import stat
 import glob
+import configparser
 import requests
 from zipfile import ZipFile
-from io import BytesIO
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -42,15 +43,42 @@ def login(email, password, driver):
 
     return driver
 
-def download_chromedriver():
+def download_chromedriver(chrome_version):
+    # Determine the operating system
+    system = platform.system().lower()
+    
+    # Determine the chromedriver URL based on the operating system and Chrome version
+    if system == "windows":
+        chromedriver_url = f"https://chromedriver.storage.googleapis.com/{chrome_version}/chromedriver_win32.zip"
+    elif system == "darwin":
+        chromedriver_url = f"https://chromedriver.storage.googleapis.com/{chrome_version}/chromedriver_mac64.zip"
+    else:
+        # Linux
+        chromedriver_url = f"https://chromedriver.storage.googleapis.com/{chrome_version}/chromedriver_linux64.zip"
+
+    # Download chromedriver zip file
     print("Downloading chromedriver...")
-    url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
-    response = requests.get(url)
-    version_number = response.text.strip()
-    chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_win32.zip"
     response = requests.get(chromedriver_url)
-    with ZipFile(BytesIO(response.content)) as zip_file:
-        zip_file.extractall()
+    with open("chromedriver.zip", "wb") as f:
+        f.write(response.content)
+    
+    # Extract chromedriver
+    with ZipFile("chromedriver.zip", "r") as zip_ref:
+        zip_ref.extractall()
+    
+    # Delete chromedriver zip file
+    os.remove("chromedriver.zip")
+
+    # Set executable permissions for chromedriver
+    chromedriver_path = os.path.abspath("chromedriver")
+    os.chmod(chromedriver_path, os.stat(chromedriver_path).st_mode | stat.S_IEXEC)
+
+    print("Chromedriver downloaded and set to executable.")
+    
+    # Return the path of chromedriver
+    return chromedriver_path
+
+
 
 def download_csv(driver):
     time.sleep(20)
@@ -91,13 +119,20 @@ def add_to_master_csv(new_csv_file):
 def main():
     email = os.environ.get('EMAIL')
     password = os.environ.get('PASSWORD')
+    chrome_version = os.environ.get('CHROME_VERSION')
 
     options = Options()
     options.add_argument("--headless")
-    if not os.path.exists('chromedriver'):
-        download_chromedriver()
-    service = Service('chromedriver')
+
+    chromedriver_path = download_chromedriver(chrome_version)
+    
+    if not os.path.exists(chromedriver_path):
+        print("chromedriver not found!")
+        return
+    
+    service = Service(chromedriver_path)
     service.start()
+    
     driver = webdriver.Remote(service.service_url, options=options)
     
     driver = login(email, password, driver)
