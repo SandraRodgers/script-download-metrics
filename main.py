@@ -71,6 +71,7 @@ def download_chromedriver(chrome_version):
     response = requests.get(chromedriver_url)
     with open("chromedriver.zip", "wb") as f:
         f.write(response.content)
+    print(f"Wrote to {os.path.abspath('chromedriver.zip')}")
     print("Chromedriver download complete.")  # Verification message
 
     # Verify the file path where the script expects to find the "chromedriver.zip" file
