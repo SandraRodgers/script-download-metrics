@@ -25,7 +25,7 @@ config.read('config.ini')
 # download_dir = '/home/runner/work/script-download-metrics/script-download-metrics'
 
 # # Configure Chrome options 
-# options = Options()
+options = Options()
 # options.add_experimental_option("prefs", {
 #   "download.default_directory": download_dir,
 #   "download.prompt_for_download": False,
