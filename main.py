@@ -130,7 +130,7 @@ def download_csv(driver):
         export_csv_button.click()
         print("Export CSV button clicked")
         # Wait for the file to download
-        time.sleep(10)  # Adjust the time according to your download speed
+        time.sleep(30)  # Adjust the time according to your download speed
 
     except TimeoutException:
         print("Timed out waiting for Export CSV button to be clickable.")
