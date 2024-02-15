@@ -92,7 +92,7 @@ def download_csv(driver):
     driver.get("https://dash.readme.com/project/api-beta-deepgram/v1.0/metrics/api-calls")
     try:
         # Click on the "Export CSV" button
-        export_csv_button = WebDriverWait(driver, 20).until(
+        export_csv_button = WebDriverWait(driver, 30).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Export CSV')]"))
         )
         print("Export CSV button found:", export_csv_button.get_attribute('outerHTML'))
