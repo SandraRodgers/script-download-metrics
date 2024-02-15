@@ -75,11 +75,14 @@ def download_chromedriver(chrome_version):
     zip_ref.extractall()  
 
   # Set permissions
-  chromedriver_path = "./chromedriver-linux64"
-  os.chmod(chromedriver_path, 0o755)
+
+    chromedriver_file = "./chromedriver-linux64/chromedriver"
+    chromedriver_path = "./chromedriver-linux64"
+    os.chmod(chromedriver_path, 0o777)
+    os.chmod(chromedriver_file, 0o777)
 
   print("ChromeDriver downloaded successfully!")
-  return chromedriver_path
+  return chromedriver_file
 
 
 
@@ -127,13 +130,14 @@ def main():
     options = Options()
     options.add_argument("--headless")
 
-    chromedriver_path = download_chromedriver(chrome_version)
+    chromedriver_file = download_chromedriver(chrome_version)
     
-    if not os.path.exists(chromedriver_path):
-        print("chromedriver not found!")
-        return
+    # if not os.path.exists(chromedriver_path):
+    #     print("chromedriver not found!")
+    #     return
     
-    service = Service(chromedriver_path)
+    print("starting service...", chromedriver_file)
+    service = Service(chromedriver_file)
     service.start()
     
     driver = webdriver.Remote(service.service_url, options=options)
