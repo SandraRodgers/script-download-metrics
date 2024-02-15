@@ -90,8 +90,15 @@ def download_chromedriver(chrome_version):
 def download_csv(driver):
     time.sleep(20)
     driver.get("https://dash.readme.com/project/api-beta-deepgram/v1.0/metrics/api-calls")
+    driver.implicitly_wait(30)
+    # Check if element with class "MetricsPage" exists
+    element = driver.find_element(By.CSS_SELECTOR, "div.MetricsPage") 
+    print("MetricsPage found:", element.get_attribute('outerHTML'))
+    if element:
+        print("MetricsPage div found!")
+    else:
+        print("MetricsPage div NOT found!")
     try:
-        time.sleep(30)
         # Click on the "Export CSV" button
         export_csv_button = WebDriverWait(driver, 30).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Export CSV')]"))
