@@ -9,7 +9,6 @@ import requests
 import zipfile
 from zipfile import ZipFile
 
-from selenium_profiles import Chrome, profiles
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
