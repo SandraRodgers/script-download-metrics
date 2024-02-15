@@ -83,19 +83,19 @@ def download_chromedriver(chrome_version):
         print(f"File not found at: {chromedriver_path}")
         return None
     
-      # Extract chromedriver
-  extracted_dir = os.path.dirname(chromedriver_path) 
-  with zipfile.ZipFile(chromedriver_path, "r") as zip_ref:
-      zip_ref.extractall(extracted_dir)  
+    # Extract chromedriver
+    extracted_dir = os.path.dirname(chromedriver_path)
+    with zipfile.ZipFile(chromedriver_path, "r") as zip_ref:
+        zip_ref.extractall(extracted_dir)  
 
-  # Get path to extracted chromedriver
-  chromedriver_exe = os.path.join(extracted_dir, "chromedriver")
+    # Get path to extracted chromedriver
+    chromedriver_exe = os.path.join(extracted_dir, "chromedriver")
 
-  # Set permissions
-  os.chmod(chromedriver_exe, 0o755) 
+    # Set permissions
+    os.chmod(chromedriver_exe, 0o755) 
 
-  # Return extracted exe path
-  return chromedriver_exe
+    # Return extracted exe path
+    return chromedriver_exe
 
 
 
