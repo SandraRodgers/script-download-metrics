@@ -180,7 +180,7 @@ def main():
     # Configure Chrome options 
     options = Options()
     options.add_experimental_option("prefs", {
-    #   "download.default_directory": download_dir,
+      "download.default_directory": download_dir,
     #   "download.prompt_for_download": False,
     #   "download.directory_upgrade": True,
     #   "safebrowsing.enabled": True
@@ -190,7 +190,7 @@ def main():
 
     service = Service(chromedriver_file)
     #Create driver 
-    driver = webdriver.Chrome(service,options=options)
+    driver = webdriver.Chrome(chromedriver_file,options=options)
     service.start()
     
     driver = webdriver.Remote(service.service_url, options=options)
