@@ -53,17 +53,20 @@ def download_chromedriver(chrome_version):
         chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
         response = requests.get(chromedriver_url)
         version_number = response.text.strip()
+        print("windows", version_number)
         chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_win32.zip"
     elif system == "darwin":
         chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
         response = requests.get(chromedriver_url)
         version_number = response.text.strip()
+        print("darwin", version_number)
         chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_mac64.zip"
     else:
         # Linux
         chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
         response = requests.get(chromedriver_url)
         version_number = response.text.strip()
+        print("linux", version_number)
         chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_linux64.zip"
 
     # Download chromedriver zip file
