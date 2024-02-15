@@ -64,7 +64,8 @@ def download_chromedriver(chrome_version):
     else:
         # Linux
         # chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
-        chromedriver_url = "https://chromedriver.storage.googleapis.com/121.0.6167.160/linux64/chromedriver_linux64.zip"
+        https://storage.googleapis.com/chrome-for-testing-public/121.0.6167.85/linux64/chrome-linux64.zip
+        chromedriver_url = "https://storage.googleapis.com/121.0.6167.160/linux64/chromedriver_linux64.zip"
         response = requests.get(chromedriver_url)
         version_number = response.text.strip()
         print("linux", version_number)
