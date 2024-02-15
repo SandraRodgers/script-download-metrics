@@ -1,5 +1,6 @@
 import time
 import os
+import json
 import platform
 import stat
 import glob
@@ -51,12 +52,13 @@ import zipfile
 def download_chromedriver(chrome_version):
 
   # Get latest stable version info from API
-  api_url = "https://www.googleapis.com/storage/v1/b/chromium-browser-snapshots/o?prefix=Chrome-for-Testing%2Fstable%2F"
+  api_url = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions.json"
   response = requests.get(api_url)
-  latest_info = response.json()["items"][0]
+  print(json.dumps(response.json()["versions"][0]["version"], indent=2))
+  latest_version = json.dumps(response.json()["versions"][0]["version"], indent=2)
   
   # Extract version and platform 
-  latest_version = latest_info["name"].split("/")[-1]
+#   latest_version = latest_info["name"].split("/")[-1]
   platform = "linux64" # Set platform
   
   # Construct download URL
@@ -182,33 +184,33 @@ def main():
 
     chromedriver_path = download_chromedriver(chrome_version)
     
-    if not os.path.exists(chromedriver_path):
-        print("chromedriver not found!")
-        return
+    # if not os.path.exists(chromedriver_path):
+    #     print("chromedriver not found!")
+    #     return
     
-    service = Service(chromedriver_path)
-    service.start()
+    # service = Service(chromedriver_path)
+    # service.start()
     
-    driver = webdriver.Remote(service.service_url, options=options)
+    # driver = webdriver.Remote(service.service_url, options=options)
     
-    driver = login(email, password, driver)
-    download_csv(driver)
+    # driver = login(email, password, driver)
+    # download_csv(driver)
 
-    # Find the latest downloaded CSV file
-    directory = os.getcwd()
-    list_of_files = glob.glob(os.path.join(directory, '*.csv'))
-    if not list_of_files:
-        print(f"No CSV files found in {directory}")
-        return
+    # # Find the latest downloaded CSV file
+    # directory = os.getcwd()
+    # list_of_files = glob.glob(os.path.join(directory, '*.csv'))
+    # if not list_of_files:
+    #     print(f"No CSV files found in {directory}")
+    #     return
 
-    # Get the latest downloaded CSV file
-    latest_file = max(list_of_files, key=os.path.getmtime)
-    print(f"Latest file: {latest_file}")
+    # # Get the latest downloaded CSV file
+    # latest_file = max(list_of_files, key=os.path.getmtime)
+    # print(f"Latest file: {latest_file}")
 
-    # Add the contents of the latest downloaded CSV file to master.csv
-    add_to_master_csv(latest_file)
+    # # Add the contents of the latest downloaded CSV file to master.csv
+    # add_to_master_csv(latest_file)
 
-    driver.quit()
+    # driver.quit()
 
 if __name__ == "__main__":
     main()
