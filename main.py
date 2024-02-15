@@ -28,7 +28,9 @@ download_dir = '/home/runner/work/script-download-metrics/script-download-metric
 options = Options()
 options.add_experimental_option("prefs", {
   "download.default_directory": download_dir,
-  # other preferences
+  "download.prompt_for_download": False,
+  "download.directory_upgrade": True,
+  "safebrowsing.enabled": True
 })
 
 # Create driver 
