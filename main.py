@@ -93,7 +93,9 @@ def download_csv(driver):
     driver.implicitly_wait(30)
     # Check if element with class "MetricsPage" exists
     element = driver.find_element(By.CSS_SELECTOR, "div.MetricsPage")
-    csv_element = driver.find_element((By.XPATH, "//button[contains(., 'Export CSV')]"))
+
+    csv_element = driver.find_element(By.XPATH, "//button[contains(., 'Export CSV')]")
+
     print("MetricsPage found:", element.get_attribute('outerHTML'))
     if element:
         print("MetricsPage div found!")
