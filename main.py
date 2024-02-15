@@ -94,15 +94,18 @@ def download_csv(driver):
     # Check if element with class "MetricsPage" exists
     element = driver.find_element(By.CSS_SELECTOR, "div.MetricsPage")
 
-    csv_element = driver.find_element(By.XPATH, "//button[contains(., 'Export CSV')]")
+    csv_button = driver.find_element(By.XPATH, "//button[contains(., 'Export CSV')]")
+    driver.execute_script("arguments[0].removeAttribute('disabled');", csv_button)
+    print(driver.execute_script("return arguments[0].hasAttribute('disabled');", csv_button))
+
 
     print("MetricsPage found:", element.get_attribute('outerHTML'))
     if element:
         print("MetricsPage div found!")
     else:
         print("MetricsPage div NOT found!")
-    print("Export CSV button found:", csv_element.get_attribute('outerHTML'))
-    if csv_element:
+    print("Export CSV button found:", csv_button.get_attribute('outerHTML'))
+    if csv_button:
         print("Export CSV button found!")
     else:
         print("Export CSV button NOT found!")
@@ -115,9 +118,9 @@ def download_csv(driver):
         export_csv_button = WebDriverWait(driver, 30).until(
         EC.visibility_of_element_located((By.XPATH, "//button[contains(., 'Export CSV')]"))  
 )
-        WebDriverWait(driver, 300).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Export CSV')]"))
-        )
+        # WebDriverWait(driver, 300).until(
+        #     EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Export CSV')]"))
+        # )
 
         # Click on the "Export CSV" button
         export_csv_button = WebDriverWait(driver, 30).until(
