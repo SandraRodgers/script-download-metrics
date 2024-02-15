@@ -115,6 +115,10 @@ def download_csv(driver):
         export_csv_button = WebDriverWait(driver, 30).until(
         EC.visibility_of_element_located((By.XPATH, "//button[contains(., 'Export CSV')]"))  
 )
+        WebDriverWait(driver, 300).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Export CSV')]"))
+        )
+
         # Click on the "Export CSV" button
         export_csv_button = WebDriverWait(driver, 30).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Export CSV')]"))
