@@ -22,19 +22,19 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 # Set download directory 
-download_dir = '/home/runner/work/script-download-metrics/script-download-metrics'
+# download_dir = '/home/runner/work/script-download-metrics/script-download-metrics'
 
-# Configure Chrome options 
-options = Options()
-options.add_experimental_option("prefs", {
-  "download.default_directory": download_dir,
-  "download.prompt_for_download": False,
-  "download.directory_upgrade": True,
-  "safebrowsing.enabled": True
-})
+# # Configure Chrome options 
+# options = Options()
+# options.add_experimental_option("prefs", {
+#   "download.default_directory": download_dir,
+#   "download.prompt_for_download": False,
+#   "download.directory_upgrade": True,
+#   "safebrowsing.enabled": True
+# })
 
 # Create driver 
-driver = webdriver.Chrome(options=options)
+# driver = webdriver.Chrome(options=options)
 
 def login(email, password, driver):
     driver.get("https://dash.readme.com/login")
