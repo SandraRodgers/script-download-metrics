@@ -36,6 +36,7 @@ def login(email, password, driver):
         login_button = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'Button_primary') and contains(., 'Log In')]"))
         )
+        print("Login button found:", login_button.get_attribute('outerHTML'))
 
         login_button.click()
         time.sleep(20)  # Wait for login process to complete
