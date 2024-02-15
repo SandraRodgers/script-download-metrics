@@ -9,6 +9,7 @@ import requests
 import zipfile
 from zipfile import ZipFile
 
+from selenium_profiles import Chrome, profiles
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -21,20 +22,7 @@ import pandas as pd
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-# Set download directory 
-# download_dir = '/home/runner/work/script-download-metrics/script-download-metrics'
 
-# # Configure Chrome options 
-options = Options()
-options.add_experimental_option("prefs", {
-#   "download.default_directory": download_dir,
-#   "download.prompt_for_download": False,
-#   "download.directory_upgrade": True,
-#   "safebrowsing.enabled": True
-})
-
-# Create driver 
-driver = webdriver.Chrome(options=options)
 
 def login(email, password, driver):
     driver.get("https://dash.readme.com/login")
@@ -184,7 +172,26 @@ def main():
     #     return
     
     print("starting service...", chromedriver_file)
+
+
+
+    # Set download directory 
+    download_dir = '/home/runner/work/script-download-metrics/script-download-metrics'
+
+    # Configure Chrome options 
+    options = Options()
+    options.add_experimental_option("prefs", {
+    #   "download.default_directory": download_dir,
+    #   "download.prompt_for_download": False,
+    #   "download.directory_upgrade": True,
+    #   "safebrowsing.enabled": True
+    })
+
+    
+
     service = Service(chromedriver_file)
+    #Create driver 
+    driver = webdriver.Chrome(service,options=options)
     service.start()
     
     driver = webdriver.Remote(service.service_url, options=options)
