@@ -92,18 +92,18 @@ def download_csv(driver):
     driver.get("https://dash.readme.com/project/api-beta-deepgram/v1.0/metrics/api-calls")
     driver.implicitly_wait(30)
     # Check if element with class "MetricsPage" exists
-    element = driver.find_element(By.CSS_SELECTOR, "div.MetricsPage")
+    # element = driver.find_element(By.CSS_SELECTOR, "div.MetricsPage")
 
     csv_button = driver.find_element(By.XPATH, "//button[contains(., 'Export CSV')]")
     driver.execute_script("arguments[0].removeAttribute('disabled');", csv_button)
     print(driver.execute_script("return arguments[0].hasAttribute('disabled');", csv_button))
 
 
-    print("MetricsPage found:", element.get_attribute('outerHTML'))
-    if element:
-        print("MetricsPage div found!")
-    else:
-        print("MetricsPage div NOT found!")
+    # print("MetricsPage found:", element.get_attribute('outerHTML'))
+    # if element:
+    #     print("MetricsPage div found!")
+    # else:
+    #     print("MetricsPage div NOT found!")
     print("Export CSV button found:", csv_button.get_attribute('outerHTML'))
     if csv_button:
         print("Export CSV button found!")
@@ -179,6 +179,7 @@ def main():
 
     # Find the latest downloaded CSV file
     directory = os.getcwd()
+    print(f"Looking for CSV files in {directory}")
     list_of_files = glob.glob(os.path.join(directory, '*.csv'))
     if not list_of_files:
         print(f"No CSV files found in {directory}")
