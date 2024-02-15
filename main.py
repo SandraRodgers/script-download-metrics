@@ -21,6 +21,19 @@ import pandas as pd
 config = configparser.ConfigParser()
 config.read('config.ini')
 
+# Set download directory 
+download_dir = '/home/runner/work/script-download-metrics/script-download-metrics'
+
+# Configure Chrome options 
+options = Options()
+options.add_experimental_option("prefs", {
+  "download.default_directory": download_dir,
+  # other preferences
+})
+
+# Create driver 
+driver = webdriver.Chrome(options=options)
+
 def login(email, password, driver):
     driver.get("https://dash.readme.com/login")
     
