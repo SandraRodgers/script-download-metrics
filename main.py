@@ -44,62 +44,95 @@ def login(email, password, driver):
 
     return driver
 
+import requests
+import os
+import zipfile
+
 def download_chromedriver(chrome_version):
-    # Determine the operating system
-    system = platform.system().lower()
+
+  # Get latest stable version info from API
+  api_url = "https://www.googleapis.com/storage/v1/b/chromium-browser-snapshots/o?prefix=Chrome-for-Testing%2Fstable%2F"
+  response = requests.get(api_url)
+  latest_info = response.json()["items"][0]
+  
+  # Extract version and platform 
+  latest_version = latest_info["name"].split("/")[-1]
+  platform = "linux64" # Set platform
+  
+  # Construct download URL
+  download_url = f"https://storage.googleapis.com/chromium-browser-snapshots/Chrome-for-Testing/stable/{latest_version}/chromedriver_{platform}.zip"
+
+  # Download and extract ChromeDriver
+  response = requests.get(download_url)
+  with open("chromedriver.zip", "wb") as f:
+    f.write(response.content)
+  
+  with zipfile.ZipFile("chromedriver.zip", "r") as zip_ref:
+    zip_ref.extractall()  
+
+  # Set permissions
+  chromedriver_path = "./chromedriver"
+  os.chmod(chromedriver_path, 0o755)
+
+  print("ChromeDriver downloaded successfully!")
+  return chromedriver_path
+
+
+# def download_chromedriver(chrome_version):
+#     # Determine the operating system
+#     system = platform.system().lower()
     
-    # Determine the chromedriver URL based on the operating system
-    if system == "windows":
-        chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
-        response = requests.get(chromedriver_url)
-        version_number = response.text.strip()
-        print("windows", version_number)
-        chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_win32.zip"
-    elif system == "darwin":
-        chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
-        response = requests.get(chromedriver_url)
-        version_number = response.text.strip()
-        print("darwin", version_number)
-        chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_mac64.zip"
-    else:
-        # Linux
-        # chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
-        chromedriver_url = "https://storage.googleapis.com/chrome-for-testing-public/121.0.6167.85/linux64/chrome-linux64.zip"
-        response = requests.get(chromedriver_url)
-        version_number = response.text.strip()
-        print("linux printing the", version_number)
-        chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_linux64.zip"
+#     # Determine the chromedriver URL based on the operating system
+#     if system == "windows":
+#         chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+#         response = requests.get(chromedriver_url)
+#         version_number = response.text.strip()
+#         print("windows", version_number)
+#         chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_win32.zip"
+#     elif system == "darwin":
+#         chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+#         response = requests.get(chromedriver_url)
+#         version_number = response.text.strip()
+#         print("darwin", version_number)
+#         chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_mac64.zip"
+#     else:
+#         # Linux
+#         # chromedriver_url = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+#         chromedriver_url = "https://storage.googleapis.com/chrome-for-testing-public/121.0.6167.85/linux64/chrome-linux64.zip"
+#         response = requests.get(chromedriver_url)
+#         version_number = response.text.strip()
+#         chromedriver_url = f"https://chromedriver.storage.googleapis.com/{version_number}/chromedriver_linux64.zip"
 
-    # Download chromedriver zip file
-    print("Downloading chromedriver...")
-    response = requests.get(chromedriver_url)
-    with open("chromedriver.zip", "wb") as f:
-        f.write(response.content)
-    print(f"Wrote to {os.path.abspath('chromedriver.zip')}")
-    print("Chromedriver download complete.")
-    time.sleep(10)
-    # Verify the file path where the script expects to find the "chromedriver.zip" file
-    chromedriver_path = os.path.abspath("chromedriver.zip")
-    print(f"Expected file path: {chromedriver_path}")  # Print the expected file path
+#     # Download chromedriver zip file
+#     print("Downloading chromedriver...")
+#     response = requests.get(chromedriver_url)
+#     with open("chromedriver.zip", "wb") as f:
+#         f.write(response.content)
+#     print(f"Wrote to {os.path.abspath('chromedriver.zip')}")
+#     print("Chromedriver download complete.")
+#     time.sleep(10)
+#     # Verify the file path where the script expects to find the "chromedriver.zip" file
+#     chromedriver_path = os.path.abspath("chromedriver.zip")
+#     print(f"Expected file path: {chromedriver_path}")  # Print the expected file path
 
-    # Check if the file exists at the specified path
-    if not os.path.exists(chromedriver_path):
-        print(f"File not found at: {chromedriver_path}")
-        return None
+#     # Check if the file exists at the specified path
+#     if not os.path.exists(chromedriver_path):
+#         print(f"File not found at: {chromedriver_path}")
+#         return None
     
-    # Extract chromedriver
-    extracted_dir = os.path.dirname(chromedriver_path)
-    with zipfile.ZipFile(chromedriver_path, "r") as zip_ref:
-        zip_ref.extractall(extracted_dir)  
+#     # Extract chromedriver
+#     extracted_dir = os.path.dirname(chromedriver_path)
+#     with zipfile.ZipFile(chromedriver_path, "r") as zip_ref:
+#         zip_ref.extractall(extracted_dir)  
 
-    # Get path to extracted chromedriver
-    chromedriver_exe = os.path.join(extracted_dir, "chromedriver")
+#     # Get path to extracted chromedriver
+#     chromedriver_exe = os.path.join(extracted_dir, "chromedriver")
 
-    # Set permissions
-    os.chmod(chromedriver_exe, 0o755) 
+#     # Set permissions
+#     os.chmod(chromedriver_exe, 0o755) 
 
-    # Return extracted exe path
-    return chromedriver_exe
+#     # Return extracted exe path
+#     return chromedriver_exe
 
 
 
