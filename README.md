@@ -13,7 +13,7 @@ This Python script automates downloading a CSV report from a web dashboard and a
 The script does the following:
 
 - Logs into the web dashboard using credentials loaded from .env
-  Navigates to the CSV export page
+- Navigates to the CSV export page
 - Clicks the export button to download the CSV file
 - Checks for an existing master.xlsx file. If it doesn't exist, creates a new Excel file. If it exists, appends the CSV data into a new sheet
 - Names the sheet based on the date in the CSV data Usage
@@ -27,7 +27,7 @@ The script does the following:
 pip install -r requirements.txt
 ```
 
-3. Add your credentials to .env
+3. Add your credentials to `.env`
 
 4. Run the script:
 
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-5. Find downloaded CSVs in /csv_exports and master.xlsx in root folder
+5. Find downloaded CSVs in `/files` and `master.xlsx` in root folder
 
 ## Customization
 
