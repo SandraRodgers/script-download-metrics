@@ -1,27 +1,14 @@
-import time
-import os
-import json
-import platform
-import stat
-import glob
-import configparser
-import requests
-import zipfile
-from zipfile import ZipFile
-
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+import os
+import glob
 import pandas as pd
+import time
+from dotenv import load_dotenv
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-
-
+load_dotenv()
 
 def login(email, password, driver):
     driver.get("https://dash.readme.com/login")
@@ -38,182 +25,81 @@ def login(email, password, driver):
         login_button = WebDriverWait(driver, 20).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'Button_primary') and contains(., 'Log In')]"))
         )
-        print("Login button found:", login_button.get_attribute('outerHTML'))
 
         login_button.click()
-        time.sleep(20)  # Wait for login process to complete
+        time.sleep(10)  # Wait for login process to complete
         
     except Exception as e:
         print("Exception occurred during login:", e)
 
     return driver
 
-import requests
-import os
-import zipfile
-
-def download_chromedriver(chrome_version):
-
-  # Get latest stable version info from API
-#   api_url = "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json"
-#   response = requests.get(api_url)
-#   print(json.dumps(response.json()["versions"], indent=2))
-#   latest_version = json.dumps(response.json()["versions"][0]["version"], indent=2)
-  
-  # Extract version and platform 
-  latest_version = "121.0.6167.16"
-#   latest_version = latest_info["name"].split("/")[-1]
-#   platform = "linux64" # Set platform
-  
-#   # Construct download URL
-  download_url = "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.16/linux64/chromedriver-linux64.zip"
-#   download_url = f"https://storage.googleapis.com/chromium-browser-snapshots/Chrome-for-Testing/stable/{latest_version}/chromedriver_{platform}.zip"
-#   print("Download URL:", download_url)
-  # Download and extract ChromeDriver
-  response = requests.get(download_url)
-  with open("chromedriver.zip", "wb") as f:
-    f.write(response.content)
-  
-  with zipfile.ZipFile("chromedriver.zip", "r") as zip_ref:
-    zip_ref.extractall()  
-
-  # Set permissions
-
-    chromedriver_file = "./chromedriver-linux64/chromedriver"
-    chromedriver_path = "./chromedriver-linux64"
-    os.chmod(chromedriver_path, 0o777)
-    os.chmod(chromedriver_file, 0o777)
-
-  print("ChromeDriver downloaded successfully!")
-  return chromedriver_file
-
-
-
 def download_csv(driver):
-    time.sleep(20)
-    driver.get("https://dash.readme.com/project/api-beta-deepgram/v1.0/metrics/api-calls")
-    driver.implicitly_wait(30)
-    # Check if element with class "MetricsPage" exists
-    # element = driver.find_element(By.CSS_SELECTOR, "div.MetricsPage")
+  print("Downloading CSV file...")
+    # Navigate to the webpage containing the button you want to click
+  driver.get("https://dash.readme.com/project/api-beta-deepgram/v1.0/metrics/api-calls")
+  time.sleep(10)
+  # Find and click the button that triggers the file download
+  download_button = driver.find_element(By.XPATH, "//button[contains(., 'Export CSV')]")
 
-    csv_button = driver.find_element(By.XPATH, "//button[contains(., 'Export CSV')]")
-    driver.execute_script("arguments[0].removeAttribute('disabled');", csv_button)
-    print(driver.execute_script("return arguments[0].hasAttribute('disabled');", csv_button))
-
-
-    # print("MetricsPage found:", element.get_attribute('outerHTML'))
-    # if element:
-    #     print("MetricsPage div found!")
-    # else:
-    #     print("MetricsPage div NOT found!")
-    print("Export CSV button found:", csv_button.get_attribute('outerHTML'))
-    if csv_button:
-        print("Export CSV button found!")
-    else:
-        print("Export CSV button NOT found!")
-    try:
-        export_csv_button = WebDriverWait(driver, 30).until(
-        EC.presence_of_element_located((By.XPATH, "//button[contains(., 'Export CSV')]"))
-    )
-
-        # Wait for visibility of export button
-        export_csv_button = WebDriverWait(driver, 30).until(
-        EC.visibility_of_element_located((By.XPATH, "//button[contains(., 'Export CSV')]"))  
-)
-        # WebDriverWait(driver, 300).until(
-        #     EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Export CSV')]"))
-        # )
-
-        # Click on the "Export CSV" button
-        export_csv_button = WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Export CSV')]"))
-        )
-        print("Export CSV button found:", export_csv_button.get_attribute('outerHTML'))
-        export_csv_button.click()
-        print("Export CSV button clicked")
-        # Wait for the file to download
-        time.sleep(30)  # Adjust the time according to your download speed
-
-    except TimeoutException:
-        print("Timed out waiting for Export CSV button to be clickable.")
-
-    finally:
-        driver.quit()
+  download_button.click()
+  time.sleep(10)
 
 def add_to_master_csv(new_csv_file):
-    # Check if the master.csv file exists
-    if not os.path.exists('master.xlsx'):
-        # If it doesn't exist, create a new master.csv with the content of the new CSV file
-        df = pd.read_csv(new_csv_file)
-        # Write the DataFrame to a new master.csv file with sheet name as 'Sheet1'
-        df.to_excel('master.xlsx', index=False, sheet_name='Sheet1')
-    else:
-      print("Appending new sheet to existing Excel file...")
-      # If the master.xlsx already exists, open it and append a new sheet with the content of the new CSV file
-      with pd.ExcelWriter('master.xlsx', mode='a', engine='openpyxl') as writer:
-          df_new = pd.read_csv(new_csv_file)  # Read the new CSV file into a DataFrame
-          sheet_name = f'Data_{pd.to_datetime(df_new["time"][0]).date()}'
-          # Write the DataFrame to the master.xlsx file with a new sheet name based on the date
-          df_new.to_excel(writer, index=False, sheet_name=sheet_name)
+  # Check if the master.csv file exists
+  if not os.path.exists(f"{os.getenv('DIRECTORY')}master.xlsx"):
+      # If it doesn't exist, create a new master.xlsx with the content of the new CSV file
+      new_data = pd.read_csv(new_csv_file)
+      # Write the DataFrame to a new master.csv file with sheet name as 'Sheet1'
+      new_data.to_excel(f"{os.getenv('DIRECTORY')}master.xlsx", index=False, sheet_name='Sheet1')
+  else:
+    print("Appending new sheet to existing Excel file...")
+    # If the master.xlsx already exists, open it and append a new sheet with the content of the new CSV file
+    with pd.ExcelWriter(f"{os.getenv('DIRECTORY')}master.xlsx", mode='a', engine='openpyxl') as writer:
+        data = pd.read_csv(new_csv_file)  # Read the new CSV file into a DataFrame
+        sheet_name = f'Data_{pd.to_datetime(data["time"][0]).date()}'
+        # Write the DataFrame to the master.xlsx file with a new sheet name based on the date
+        data.to_excel(writer, index=False, sheet_name=sheet_name)
 
 def main():
-    email = os.environ.get('EMAIL')
-    password = os.environ.get('PASSWORD')
-    chrome_version = os.environ.get('CHROME_VERSION')
+  # Set up Chrome options to automatically download files to the default downloads folder
+  chrome_options = webdriver.ChromeOptions()
+  chrome_options.add_experimental_option("prefs", {
+    "download.default_directory": f"{os.getenv('DIRECTORY')}files",
+    "download.prompt_for_download": False,
+    "download.directory_upgrade": True
+  })
 
-    options = Options()
-    options.add_argument("--headless")
+  email = os.getenv('EMAIL')
+  password = os.getenv('PASSWORD')
 
-    chromedriver_file = download_chromedriver(chrome_version)
-    
-    # if not os.path.exists(chromedriver_path):
-    #     print("chromedriver not found!")
-    #     return
-    
-    print("starting service...", chromedriver_file)
+  # Initialize the Chrome webdriver with the options
+  driver = webdriver.Chrome(options=chrome_options)
+  driver = login(email, password, driver)
+  
+  # Download the CSV file
+  download_csv(driver)
+  print("CSV file downloaded")
+  
+  # Find the latest downloaded CSV file
+  directory = f"{os.getenv('DIRECTORY')}files/"
+  list_of_files = glob.glob(os.path.join(directory, '*.csv'))
+  print(list_of_files)
+  if not list_of_files:
+      print(f"No CSV files found in {directory}")
+      return
 
+  # Get the latest downloaded CSV file
+  latest_file = max(list_of_files, key=os.path.getmtime)
+  print(f"Latest file: {latest_file}")
 
+  # Add the contents of the latest downloaded CSV file to master.csv
+  add_to_master_csv(latest_file)
 
-    # Set download directory 
-    download_dir = '/home/runner/work/script-download-metrics/script-download-metrics'
-
-    # Configure Chrome options 
-    options = Options()
-    options.add_experimental_option("prefs", {
-      "download.default_directory": download_dir,
-    #   "download.prompt_for_download": False,
-    #   "download.directory_upgrade": True,
-    #   "safebrowsing.enabled": True
-    })
-
-    
-
-    service = Service(chromedriver_file)
-    #Create driver 
-    driver = webdriver.Chrome(chromedriver_file,options=options)
-    service.start()
-    
-    driver = webdriver.Remote(service.service_url, options=options)
-    
-    driver = login(email, password, driver)
-    download_csv(driver)
-
-    # Find the latest downloaded CSV file
-    directory = os.getcwd()
-    print(f"Looking for CSV files in {directory}")
-    list_of_files = glob.glob(os.path.join(directory, '*.csv'))
-    if not list_of_files:
-        print(f"No CSV files found in {directory}")
-        return
-
-    # Get the latest downloaded CSV file
-    latest_file = max(list_of_files, key=os.path.getmtime)
-    print(f"Latest file: {latest_file}")
-
-    # Add the contents of the latest downloaded CSV file to master.csv
-    add_to_master_csv(latest_file)
-
-    driver.quit()
+  # Wait for 10 seconds before quitting the webdriver
+  time.sleep(10)
+  driver.quit()
 
 if __name__ == "__main__":
-    main()
+      main()
+
