@@ -6,7 +6,7 @@ This Python script automates downloading a CSV report from a web dashboard and a
 
 - Selenium
 - Pandas
-- Requests
+- Dotenv
 
 ## Overview
 
